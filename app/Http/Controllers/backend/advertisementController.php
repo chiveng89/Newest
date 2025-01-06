@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Advertisement;
 use App\Models\Category;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class AdvertisementController extends Controller
 {
-    public function advertisement()
+    public function advertisement(): View
     {
         $ads = Advertisement::all();
         $categories = Category::where('status', 1)->get();
@@ -18,30 +21,43 @@ class AdvertisementController extends Controller
     }
 
     public function store(Request $request)
-{
-    logger($request->all());
-
-    $request->validate([
-        'size' => 'required|string|max:255',
-        'category_id' => 'required|exists:categories,category_id',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    ]);
-
-    $imagePath = $request->file('image')->store('advertisements', 'public');
-    $imageUrl = Storage::url($imagePath);
-
-    $ads = new Advertisement();
-    $ads->size = $request->size;
-    $ads->category_id = $request->category_id;
-    $ads->image = $imageUrl;
-    $ads->save();
-
-    return redirect()->back()->with('success', 'Advertisement added successfully!');
-}
-
-
-    public function toggleStatus(Request $request, $id)
     {
+
+        $validatedData = $request->validate([
+            'size' => 'required|string|max:50',
+            'category_id' => 'required|exists:categories,category_id',
+            'image' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048', // Ensure image is required
+            'status' => 'required|boolean',
+        ]);
+
+        // Handle the image upload
+        if ($request->hasFile('image')) {
+            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->file('image')->move(public_path('images'), $fileName);
+            $validatedData['image'] = 'images/' . $fileName; // Assign the image path to validatedData
+        }
+
+        // Create the advertisement
+        Advertisement::create($validatedData);
+
+        // $imgPath = null;
+
+        // if ($request->hasFile('image')) {
+        //     $imgPath = $request->file('image')->store('public/images');
+        //     $imgPath = str_replace('public/', '', $imgPath);
+        //     dd($imgPath);
+        // }
+
+        // Advertisement::create([
+        //     'size' => $request->input('size'),
+        //     'category_id' => $request->input('category_id'),
+        //     'image' => $imgPath,
+        //     'status' => $request->input('status'),
+        // ]);
+
+        return redirect()->back()->with('success', 'Advertisement added successfully.');
+    }
+    public function toggleStatus(Request $request, $id){
         $advertisement = Advertisement::findOrFail($id);
         $advertisement->status = !$advertisement->status;
         $advertisement->save();
@@ -52,46 +68,39 @@ class AdvertisementController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
-    {
-        $ads = Advertisement::findOrFail($id);
+    // public function store(Request $request): RedirectResponse
+    // {
+    //     $request->validate([
+    //         'size' => 'required|string|max:255',
+    //         'category_id' => 'required|exists:categories,category_id',
+    //         'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //     ]);
 
-        // Validate incoming data
-        $validated = $request->validate([
-            'size' => 'required|string|max:255',
-            'redirect_url' => 'required|url',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional
-        ]);
+    //     $imagePath = $request->file('image')->store('advertisement', 'public');
 
-        // Handle image upload
-        if ($request->hasFile('image')) {
+    //     Advertisement::create([
+    //         'size' => $request->size,
+    //         'category_id' => $request->category_id,
+    //         'image' => $imagePath,
+    //     ]);
 
-            if ($ads->image && Storage::disk('public')->exists($ads->image)) {
-                Storage::disk('public')->delete($ads->image);
-            }
-            $imagePath = $request->file('image')->store('advertisements', 'public');
-            $ads->image = $imagePath;
-        }
+    //     return redirect()->back()->with('success', 'Advertisement added successfully!');
+    // }
 
-        $ads->update([
-            'size' => $validated['size'],
-            'redirect_url' => $validated['redirect_url'],
-        ]);
 
-        return redirect()->back()->with('success', 'Advertisement updated successfully!');
-    }
+  /**
+     * Delete the specified category.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
 
-    public function destroy($id)
-    {
-        $ads = Advertisement::findOrFail($id);
+     public function destroy($id)
+     {
+         $advertisement = Advertisement::findOrFail($id);
+         $advertisement->delete(); 
 
-        // Delete image from storage
-        if ($ads->image && Storage::disk('public')->exists($ads->image)) {
-            Storage::disk('public')->delete($ads->image);
-        }
+         return redirect()->route('admin.advertisement')->with('success', 'Advertisement deleted successfully');
+     }
 
-        $ads->delete();
-
-        return redirect()->back()->with('success', 'Advertisement deleted successfully!');
-    }
 }

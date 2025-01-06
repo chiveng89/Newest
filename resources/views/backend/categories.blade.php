@@ -126,7 +126,7 @@
 
                                 <!-- Delete Modal -->
                                 <div id="deleteForm" class="hidden flex justify-center fixed inset-0 bg-gray-800 bg-opacity-50 z-40">
-                                    <form method="POST" class="mt-14 bg-white w-1/3 h-72 rounded-lg">
+                                    <form action="{{ route('admin.categories.delete', $category->category_id)}}" method="POST" class="mt-14 bg-white w-1/3 h-72 rounded-lg">
                                         @csrf
                                         @method('DELETE')
                                         <div>
@@ -161,14 +161,11 @@
                                         </div>
                                     </form>
                                 </div>
-
-
                             </td>
                     </tr>
                 @endforeach
 
                 </tbody>
-
             </table>
         </div>
     </div>

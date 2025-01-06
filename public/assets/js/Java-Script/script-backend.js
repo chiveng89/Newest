@@ -287,6 +287,7 @@ function updateStatusOnServer(id, status) {
     .then(data => console.log(data))
     .catch(error => console.error("Error updating status:", error));
 }
+// delete category
 function Delete_toggleForm(categoryId = null, categoryName = '') {
     const deleteForm = document.getElementById('deleteForm');
     const form = deleteForm.querySelector('form');
@@ -307,6 +308,23 @@ function Delete_toggleForm(categoryId = null, categoryName = '') {
     }
 }
 // end delete category
+
+// Ads delete
+function Delete_toggleForm(type, id = null, size = ''){
+    const deleteForm = document.getElementById('deleteForm');
+    const form = deleteForm.querySelector('form');
+
+    if(id){
+        deleteForm.classList.remove('hidden');
+        form.setAttribute('action',`/admin/advertisement/${id}`);
+
+    }else{
+        deleteForm.classList.add('hidden');
+        form.setAttribute('action', '');
+    }
+}
+
+// end ads delete
 // add news
 function previewImage(event, previewId, svgId, placeholderId, containerId) {
     const file = event.target.files[0];
@@ -349,3 +367,4 @@ function Ads_toggleForm() {
 
 
 //
+

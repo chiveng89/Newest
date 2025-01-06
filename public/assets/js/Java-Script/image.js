@@ -42,77 +42,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 
+document.getElementById('image').addEventListener('change', function(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = document.createElement('img');
+            img.src = e.target.result;
+            img.classList.add('max-w-full', 'max-h-full', 'object-contain'); // Ensure the image fits within the container
 
-//
-document.addEventListener("DOMContentLoaded", init);
+            // Create the remove button
+            const removeButton = document.createElement('i');
+            removeButton.classList.add('fa-regular', 'fa-circle-xmark', 'absolute', 'top-0', 'right-0', 'cursor-pointer', 'text-red-500', 'hover:text-red-700');
+            removeButton.addEventListener('click', function() {
+                const preview = document.getElementById('imagePreview');
+                preview.innerHTML = ''; // Clear the image preview
+            });
 
-function init() {
-    setupFileUpload();
-    setupAdsToggle();
-}
-
-function setupFileUpload() {
-    const dropzoneFileInput = document.getElementById("image");
-    const dropzoneLabel = document.getElementById("dropzone-label");
-    const placeholder = document.getElementById("placeholder");
-    const previewImage = document.getElementById("preview-image");
-    const removeImageIcon = document.getElementById("remove-image");
-
-    if (!dropzoneFileInput || !dropzoneLabel || !placeholder || !previewImage || !removeImageIcon) {
-        console.error("Required elements for file upload are missing.");
-        return;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = ''; // Clear previous content
+            preview.appendChild(img);
+            preview.appendChild(removeButton); // Add the remove button
+        };
+        reader.readAsDataURL(file);
     }
+});
 
-    const handleFileUpload = (event) => {
-        const file = event.target.files[0];
-
-        if (file && ["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
-            const reader = new FileReader();
-
-            reader.onload = function (e) {
-                previewImage.src = e.target.result;
-                previewImage.classList.remove("hidden");
-                previewImage.style.opacity = 0;
-
-                setTimeout(() => {
-                    previewImage.style.opacity = 1;
-                }, 50);
-
-                placeholder.classList.add("hidden");
-                removeImageIcon.classList.remove("hidden");
-                dropzoneFileInput.disabled = true;
-            };
-
-            reader.readAsDataURL(file);
-        } else {
-            alert("Please upload a valid image file (JPG, PNG, or GIF).");
-            dropzoneFileInput.value = "";
-        }
-    };
-
-    const handleRemoveImage = () => {
-        previewImage.style.opacity = 0;
-
-        setTimeout(() => {
-            previewImage.src = "";
-            previewImage.classList.add("hidden");
-            placeholder.classList.remove("hidden");
-            removeImageIcon.classList.add("hidden");
-            dropzoneFileInput.value = "";
-            dropzoneFileInput.disabled = false;
-        }, 300);
-    };
-
-    dropzoneLabel.addEventListener("click", () => {
-        if (!dropzoneFileInput.disabled) {
-            dropzoneFileInput.click();
-        }
-    });
-
-    dropzoneFileInput.addEventListener("change", handleFileUpload);
-    removeImageIcon.addEventListener("click", handleRemoveImage);
-}
-
+document.getElementById('uploadButton').addEventListener('click', function() {
+    document.getElementById('image').click(); // Trigger file input click
+});
 function setupAdsToggle() {
     const adsForm = document.getElementById("adsForm");
 

@@ -19,7 +19,6 @@ return new class extends Migration
                 $table->string('size');
                 $table->unsignedBigInteger('category_id');
                 $table->foreign('category_id')->references('category_id')->on('categories')->onDelete('cascade');
-                $table->string('image')->nullable;
                 $table->enum('status', ['enabled', 'disabled'])->default('enabled');
                 $table->timestamps();
         });

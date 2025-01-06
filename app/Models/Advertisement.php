@@ -9,7 +9,7 @@ class Advertisement extends Model
 {
     use HasFactory;
     protected $table = 'advertisement';
-    protected $primaryKey = 'advertisement';
+    protected $primaryKey = 'id';
     public $incrementing = false;
     protected $fillable = [
         'size',
