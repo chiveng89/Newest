@@ -41,7 +41,7 @@ Route::post('admin/categories/toggle-status/{id}', [CategoryController::class, '
 
 Route::get('/admin/advertisement', [advertisementController::class, 'advertisement'])->name('admin.advertisement');
 Route::post('/admin/advertisement/store', [advertisementController::class, 'store'])->name('admin.advertisement.store');
-Route::put('/admin/advertisement/{id}', [advertisementController::class, 'update'])->name('admin.advertisement.update');
+Route::put('/admin/advertisement/{id}', [AdvertisementController::class, 'update'])->name('admin.advertisement.update');
 Route::delete('/admin/advertisement/{id}', [advertisementController::class, 'destroy'])->name('admin.advertisement.delete');
 Route::post('admin/advertisement/toggle-status/{id}', [advertisementController::class, 'toggleStatus'])->name('advertisement.toggle-status');
 

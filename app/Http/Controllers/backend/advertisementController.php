@@ -15,78 +15,71 @@ class AdvertisementController extends Controller
 {
     public function advertisement(): View
     {
-        $ads = Advertisement::all();
+        // $ads = Advertisement::all();
+        $ads = Advertisement::latest()->paginate(5);
+
         $categories = Category::where('status', 1)->get();
         return view('backend.advertisement', compact('ads', 'categories'));
     }
 
-    public function store(Request $request)
-    {
+                                                                                                                    public function store(Request $request)
+                                                                                                                    {
 
-        $validatedData = $request->validate([
-            'size' => 'required|string|max:50',
-            'category_id' => 'required|exists:categories,category_id',
-            'image' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048', // Ensure image is required
-            'status' => 'required|boolean',
-        ]);
+                                                                                                                        $validatedData = $request->validate([
+                                                                                                                            'size' => 'required|string|max:50',
+                                                                                                                            'category_id' => 'required|exists:categories,category_id',
+                                                                                                                            'image' => 'required|image|mimes:png,jpg,jpeg,webp|max:2048', // Ensure image is required
+                                                                                                                            'status' => 'required|boolean',
+                                                                                                                        ]);
 
-        // Handle the image upload
-        if ($request->hasFile('image')) {
-            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->file('image')->move(public_path('images'), $fileName);
-            $validatedData['image'] = 'images/' . $fileName; // Assign the image path to validatedData
-        }
+                                                                                                                        // Handle the image upload
+                                                                                                                        if ($request->hasFile('image')) {
+                                                                                                                            $fileName = time() . '_' . $request->file('image')->getClientOriginalName();
+                                                                                                                            $request->file('image')->move(public_path('images'), $fileName);
+                                                                                                                            $validatedData['image'] = 'images/' . $fileName; // Assign the image path to validatedData
+                                                                                                                        }
 
-        // Create the advertisement
-        Advertisement::create($validatedData);
+                                                                                                                        // Create the advertisement
+                                                                                                                        Advertisement::create($validatedData);
+                                                                                                                        return redirect()->back()->with('success', 'Advertisement added successfully.');
+                                                                                                                    }
+                                                                                                                    public function toggleStatus(Request $request, $id){
+                                                                                                                        $advertisement = Advertisement::findOrFail($id);
+                                                                                                                        $advertisement->status = !$advertisement->status;
+                                                                                                                        $advertisement->save();
 
-        // $imgPath = null;
+                                                                                                                        return response()->json([
+                                                                                                                            'success' => true,
+                                                                                                                            'newStatus' => $advertisement->status,
+                                                                                                                        ]);
+                                                                                                                    }
 
-        // if ($request->hasFile('image')) {
-        //     $imgPath = $request->file('image')->store('public/images');
-        //     $imgPath = str_replace('public/', '', $imgPath);
-        //     dd($imgPath);
-        // }
+     /**
+     * Update the specified category.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function update(Request $request, $id)
+{
+    $request->validate([
+        'size' => 'required|string',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-        // Advertisement::create([
-        //     'size' => $request->input('size'),
-        //     'category_id' => $request->input('category_id'),
-        //     'image' => $imgPath,
-        //     'status' => $request->input('status'),
-        // ]);
+    $advertisement = Advertisement::findOrFail($id);
+    $advertisement->size = $request->input('size');
 
-        return redirect()->back()->with('success', 'Advertisement added successfully.');
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('advertisements', 'public');
+        $advertisement->image = $imagePath;
     }
-    public function toggleStatus(Request $request, $id){
-        $advertisement = Advertisement::findOrFail($id);
-        $advertisement->status = !$advertisement->status;
-        $advertisement->save();
 
-        return response()->json([
-            'success' => true,
-            'newStatus' => $advertisement->status,
-        ]);
-    }
+    $advertisement->save();
 
-    // public function store(Request $request): RedirectResponse
-    // {
-    //     $request->validate([
-    //         'size' => 'required|string|max:255',
-    //         'category_id' => 'required|exists:categories,category_id',
-    //         'image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //     ]);
-
-    //     $imagePath = $request->file('image')->store('advertisement', 'public');
-
-    //     Advertisement::create([
-    //         'size' => $request->size,
-    //         'category_id' => $request->category_id,
-    //         'image' => $imagePath,
-    //     ]);
-
-    //     return redirect()->back()->with('success', 'Advertisement added successfully!');
-    // }
-
+    return redirect()->route('admin.advertisement.index')->with('success', 'Advertisement updated successfully!');
+}
 
   /**
      * Delete the specified category.
@@ -98,7 +91,7 @@ class AdvertisementController extends Controller
      public function destroy($id)
      {
          $advertisement = Advertisement::findOrFail($id);
-         $advertisement->delete(); 
+         $advertisement->delete();
 
          return redirect()->route('admin.advertisement')->with('success', 'Advertisement deleted successfully');
      }

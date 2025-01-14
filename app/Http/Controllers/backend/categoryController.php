@@ -8,7 +8,8 @@ use App\Models\Category;
 class categoryController extends Controller
 {
     public function categories(){
-        $categories = Category::all();
+        // $categories = Category::all();
+        $categories = Category::latest()->paginate(2    );
         return view('backend.categories', compact('categories'));
     }
     public function store(Request $request) {
@@ -74,6 +75,14 @@ class categoryController extends Controller
 //         return redirect()->back()->with('error', 'Failed to delete the category.');
 //     }
 // }
+    public function de($id){
+        try{
+
+        }
+        catch(\Exception $e){
+
+        }
+    }
     public function delete($id){
       try{
         $category = Category::findOrFail($id);

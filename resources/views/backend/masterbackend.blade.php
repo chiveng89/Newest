@@ -21,7 +21,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     {{-- <title>@yield('title', 'Admin Panel')</title> --}}
 
     {{-- Custom Styles --}}
@@ -79,7 +79,6 @@
                     <span class="text-sm">Advertisement</span>
                 </a>
             </li>
-
         </ul>
     </div>
 

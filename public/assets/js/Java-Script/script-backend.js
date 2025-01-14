@@ -240,6 +240,9 @@ function Delete_toggleForm(){
             formContainer.classList.add('hidden');
         }
     }
+
+    // Ads Edit form
+
 // status
 document.addEventListener("DOMContentLoaded", () => {
     const checkboxes = document.querySelectorAll(".status-checkbox");
@@ -274,6 +277,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
 function updateStatusOnServer(id, status) {
     fetch(`/update-category-status/${id}`, {
         method: "POST",
@@ -345,6 +349,7 @@ function previewImage(event, previewId, svgId, placeholderId, containerId) {
         reader.readAsDataURL(file);
     }
 }
+
 function removePreview(previewId, svgId, placeholderId, containerId) {
     const preview = document.getElementById(previewId);
     const svg = document.getElementById(svgId);
@@ -356,13 +361,64 @@ function removePreview(previewId, svgId, placeholderId, containerId) {
     placeholder.style.display = 'flex';
     container.style.display = 'none';
 
-    document.getElementById('dropzone-file-1').value = '';
+    document.getElementById('editImage').value = '';
 }
 
 function Ads_toggleForm() {
     console.log("Ads_toggleForm triggered");
     const form = document.getElementById("adsForm");
     form.classList.toggle("hidden");
+}
+document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for the update form
+    document.getElementById('editUploadButton').addEventListener('click', function() {
+        document.getElementById('editImage').click();
+    });
+
+    document.getElementById('editImage').addEventListener('change', function(event) {
+        previewImage(event, 'editImagePreview');
+    });
+});
+
+function previewImage(event, previewId) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = `<img src="${reader.result}" alt="Preview" class="w-full h-full object-cover">`;
+        };
+        reader.readAsDataURL(file);
+    }
+}
+
+function removePreview(previewId, fileInputId) {
+    const preview = document.getElementById(previewId);
+    preview.innerHTML = '';
+    document.getElementById(fileInputId).value = '';
+}
+
+function Edit_AdsForm(id, categoryId, imageUrl, status) {
+    // Open the edit form
+    document.getElementById('editAdsForm').classList.remove('hidden');
+
+    // Set the form values
+    document.getElementById('edit_size').value = '920 * 120'; // Set the size
+    document.getElementById('edit_categories').value = categoryId; // Set the category
+    document.getElementById('edit_status').checked = status; // Set the status
+
+    // Set the image preview
+    const preview = document.getElementById('editImagePreview');
+    if (imageUrl) {
+        preview.innerHTML = `<img src="${imageUrl}" alt="Advertisement" class="w-full h-full object-cover">`;
+    } else {
+        preview.innerHTML = ''; // Clear the preview if no image exists
+    }
+}
+
+function Edit_Ads_toggleForm() {
+    const editForm = document.getElementById('editAdsForm');
+    editForm.classList.add('hidden');
 }
 
 
